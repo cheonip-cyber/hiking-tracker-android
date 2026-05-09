@@ -1,0 +1,26 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html, body, #root {
+    height: 100%;
+    overscroll-behavior: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    @apply bg-forest-950 text-white font-sans;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* iOS safe area */
+  .pt-safe { padding-top: env(safe-area-inset-top, 1rem); }
+  .pb-safe { padding-bottom: env(safe-area-inset-bottom, 1rem); }
+}
+
+@layer utilities {
+  /* Leaflet z-index 조정 */
+  .leaflet-pane { z-index: 10 !important; }
+  .leaflet-top, .leaflet-bottom { z-index: 15 !important; }
+}
