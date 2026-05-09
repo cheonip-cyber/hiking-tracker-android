@@ -28,16 +28,34 @@ export default function MapView({ className = '' }: MapProps) {
       preferCanvas: true, // 성능 개선
     })
 
-    // CartoDB Voyager — API 키 불필요, CORS 없음, 밝은 스타일
-    L.tileLayer(
-      'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
+    // OpenTopoMap — 등고선 + 등산로 + 산 명칭 전문 타일, API키 불필요
+    const topoLayer = L.tileLayer(
+      'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
       {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
-        subdomains: 'abcd',
-        maxZoom: 19,
-        detectRetina: true,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> | <a href="https://opentopomap.org">OpenTopoMap</a>',
+        subdomains: 'abc',
+        maxZoom: 17,
+        detectRetina: false,
       }
-    ).addTo(map)
+    )
+
+    // OSM fallback (타일 로드 실패 시 대비)
+    const osmLayer = L.tileLayer(
+      'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+      {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+        maxZoom: 19,
+      }
+    )
+
+    topoLayer.on('tileerror', () => {
+      if (!map.hasLayer(osmLayer)) {
+        map.removeLayer(topoLayer)
+        osmLayer.addTo(map)
+      }
+    })
+
+    topoLayer.addTo(map)
 
     L.control.zoom({ position: 'bottomright' }).addTo(map)
 
