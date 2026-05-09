@@ -25,9 +25,6 @@ export default function MainScreen() {
             </div>
             <div>
               <p className="text-gradient font-bold text-base leading-tight">윤섭아등산가자</p>
-              <p className="text-green-400/60 text-xs">
-                {FIREBASE_ENABLED ? '클라우드 연동' : '로컬 저장 모드'}
-              </p>
             </div>
           </div>
 

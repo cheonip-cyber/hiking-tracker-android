@@ -50,14 +50,7 @@ export default function App() {
 
   return (
     <BrowserRouter>
-      {/* v1 모드 안내 배너 */}
-      {!FIREBASE_ENABLED && (
-        <div className="fixed top-0 left-0 right-0 z-50 flex justify-center pt-safe pointer-events-none">
-          <div className="glass-hi mx-4 mt-2 px-4 py-1.5 rounded-full text-xs text-green-300/70 font-medium">
-            📱 로컬 저장 모드 · 기록은 이 기기에만 저장됩니다
-          </div>
-        </div>
-      )}
+
       {/* 오프라인 배너 */}
       {!isOnline && (
         <div className="fixed top-0 left-0 right-0 z-50 flex justify-center pt-safe pointer-events-none">
