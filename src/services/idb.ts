@@ -16,22 +16,33 @@ interface HikingDB extends DBSchema {
     key: string
     value: HikeRecord & { localId: string }
   }
+  localHikes: {
+    key: string
+    value: HikeRecord & { localId: string }
+    indexes: { 'by-userId': string }
+  }
 }
 
 let _db: IDBPDatabase<HikingDB> | null = null
 
 async function getDB(): Promise<IDBPDatabase<HikingDB>> {
   if (_db) return _db
-  _db = await openDB<HikingDB>('hiking-tracker', 1, {
-    upgrade(db) {
-      db.createObjectStore('sessions',     { keyPath: 'id' })
-      db.createObjectStore('pendingHikes', { keyPath: 'localId' })
+  _db = await openDB<HikingDB>('hiking-tracker', 2, {
+    upgrade(db, oldVersion) {
+      if (oldVersion < 1) {
+        db.createObjectStore('sessions',     { keyPath: 'id' })
+        db.createObjectStore('pendingHikes', { keyPath: 'localId' })
+      }
+      if (oldVersion < 2) {
+        const store = db.createObjectStore('localHikes', { keyPath: 'localId' })
+        store.createIndex('by-userId', 'userId')
+      }
     }
   })
   return _db
 }
 
-// 트래킹 중 GPS 포인트 임시 저장 (세션 보호)
+// ─── 세션 GPS 임시 저장 ─────────────────────────────
 export async function saveSessionPoints(sessionId: string, points: GpsPoint[]): Promise<void> {
   try {
     const db = await getDB()
@@ -66,7 +77,7 @@ export async function clearSession(sessionId: string): Promise<void> {
   }
 }
 
-// Firebase 저장 실패 시 대기열에 추가
+// ─── Firebase 대기열 ────────────────────────────────
 export async function addPendingHike(hike: HikeRecord): Promise<string> {
   const db = await getDB()
   const localId = `pending_${Date.now()}`
@@ -82,4 +93,38 @@ export async function getPendingHikes(): Promise<(HikeRecord & { localId: string
 export async function removePendingHike(localId: string): Promise<void> {
   const db = await getDB()
   await db.delete('pendingHikes', localId)
+}
+
+// ─── v1 로컬 hike 저장소 ────────────────────────────
+export async function saveLocalHike(hike: HikeRecord): Promise<string> {
+  const db = await getDB()
+  const localId = `hike_${Date.now()}`
+  await db.put('localHikes', { ...hike, localId, id: localId })
+  return localId
+}
+
+export async function getLocalHikes(userId: string): Promise<HikeRecord[]> {
+  const db = await getDB()
+  const all = await db.getAllFromIndex('localHikes', 'by-userId', userId)
+  return all
+    .map(h => ({ ...h, id: h.localId } as HikeRecord))
+    .sort((a, b) => b.createdAt - a.createdAt)
+}
+
+export async function getLocalHike(localId: string): Promise<HikeRecord | null> {
+  const db = await getDB()
+  const item = await db.get('localHikes', localId)
+  return item ? ({ ...item, id: item.localId } as HikeRecord) : null
+}
+
+export async function updateLocalHike(localId: string, patch: Partial<HikeRecord>): Promise<void> {
+  const db = await getDB()
+  const existing = await db.get('localHikes', localId)
+  if (!existing) return
+  await db.put('localHikes', { ...existing, ...patch })
+}
+
+export async function deleteLocalHike(localId: string): Promise<void> {
+  const db = await getDB()
+  await db.delete('localHikes', localId)
 }

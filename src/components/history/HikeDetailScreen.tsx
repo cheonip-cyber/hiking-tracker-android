@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { ArrowLeft, Edit2, Check, Trash2, Mountain } from 'lucide-react'
-import { doc, getDoc } from 'firebase/firestore'
-import { db } from '../../services/firebase'
+import { FIREBASE_ENABLED, db } from '../../services/firebase'
 import { updateRoute, updateMemo, deleteHike } from '../../services/hikeService'
 import { formatDate, formatDuration } from '../../utils/gps'
 import type { HikeRecord } from '../../types'
@@ -20,16 +19,32 @@ export default function HikeDetailScreen() {
 
   useEffect(() => {
     if (!id) return
-    getDoc(doc(db, 'hikes', id))
-      .then((snap) => {
+    ;(async () => {
+      try {
+        // v1: 로컬
+        if (!FIREBASE_ENABLED || !db) {
+          const { getLocalHike } = await import('../../services/idb')
+          const data = await getLocalHike(id)
+          if (data) {
+            setHike(data)
+            setRouteVal(data.routeEdited || data.routeAuto)
+            setMemoVal(data.memo)
+          }
+          return
+        }
+        // v2: Firebase
+        const { doc: fsDoc, getDoc } = await import('firebase/firestore')
+        const snap = await getDoc(fsDoc(db, 'hikes', id))
         if (snap.exists()) {
           const data = { id: snap.id, ...snap.data() } as HikeRecord
           setHike(data)
           setRouteVal(data.routeEdited || data.routeAuto)
           setMemoVal(data.memo)
         }
-      })
-      .finally(() => setLoading(false))
+      } finally {
+        setLoading(false)
+      }
+    })()
   }, [id])
 
   const handleSaveRoute = async () => {

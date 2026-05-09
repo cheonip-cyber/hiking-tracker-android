@@ -2,28 +2,33 @@ import { useEffect } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { useAppStore } from './store/appStore'
 import { useAuth } from './hooks/useAuth'
+import { FIREBASE_ENABLED } from './services/firebase'
 import { syncPendingHikes } from './services/hikeService'
-import LoginScreen    from './components/ui/LoginScreen'
-import MainScreen     from './components/map/MainScreen'
-import TrackingScreen from './components/tracking/TrackingScreen'
-import SaveScreen     from './components/tracking/SaveScreen'
-import HistoryScreen  from './components/history/HistoryScreen'
+import LoginScreen      from './components/ui/LoginScreen'
+import MainScreen       from './components/map/MainScreen'
+import TrackingScreen   from './components/tracking/TrackingScreen'
+import SaveScreen       from './components/tracking/SaveScreen'
+import HistoryScreen    from './components/history/HistoryScreen'
 import HikeDetailScreen from './components/history/HikeDetailScreen'
 
 function AppRoutes() {
   const { user } = useAppStore()
   useAuth()
 
-  if (!user) return <LoginScreen />
+  // v1: 로컬 사용자 자동 설정이므로 로그인 화면 없이 바로 진입
+  // v2: Firebase 미인증 시 로그인 화면 표시
+  if (!user) {
+    return FIREBASE_ENABLED ? <LoginScreen /> : null
+  }
 
   return (
     <Routes>
-      <Route path="/"             element={<MainScreen />} />
-      <Route path="/tracking"     element={<TrackingScreen />} />
-      <Route path="/save"         element={<SaveScreen />} />
-      <Route path="/history"      element={<HistoryScreen />} />
-      <Route path="/history/:id"  element={<HikeDetailScreen />} />
-      <Route path="*"             element={<Navigate to="/" replace />} />
+      <Route path="/"            element={<MainScreen />} />
+      <Route path="/tracking"    element={<TrackingScreen />} />
+      <Route path="/save"        element={<SaveScreen />} />
+      <Route path="/history"     element={<HistoryScreen />} />
+      <Route path="/history/:id" element={<HikeDetailScreen />} />
+      <Route path="*"            element={<Navigate to="/" replace />} />
     </Routes>
   )
 }
@@ -33,9 +38,8 @@ export default function App() {
 
   // 네트워크 감지 + 오프라인 대기열 동기화
   useEffect(() => {
-    const handleOnline  = () => { setOnline(true);  syncPendingHikes() }
+    const handleOnline  = () => { setOnline(true); syncPendingHikes() }
     const handleOffline = () => setOnline(false)
-
     window.addEventListener('online',  handleOnline)
     window.addEventListener('offline', handleOffline)
     return () => {
@@ -46,6 +50,12 @@ export default function App() {
 
   return (
     <BrowserRouter>
+      {/* v1 모드 안내 배너 */}
+      {!FIREBASE_ENABLED && (
+        <div className="fixed top-0 left-0 right-0 z-50 bg-forest-700 text-white text-center text-xs py-1.5 font-medium">
+          로컬 저장 모드 (v1) · 기록은 이 기기에만 저장됩니다
+        </div>
+      )}
       {/* 오프라인 배너 */}
       {!isOnline && (
         <div className="fixed top-0 left-0 right-0 z-50 bg-amber-500 text-white text-center text-xs py-1.5 font-medium">
