@@ -24,15 +24,12 @@ export default function MapView({ className = '' }: MapProps) {
       attributionControl: true,
     })
 
-    // 카카오맵 타일 (비공식, 개인/비상업 사용)
+    // Esri World Street Map — API 키 불필요, CORS 없음, 카카오맵 유사 스타일
     L.tileLayer(
-      'https://map{s}.daumcdn.net/map_2d/1811hsm/L{z}/{y}/{x}.png',
+      'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',
       {
-        attribution: '&copy; <a href="https://map.kakao.com">Kakao</a>',
-        subdomains: '1234',
-        maxZoom: 14,
-        minZoom: 7,
-        tileSize: 256,
+        attribution: 'Tiles &copy; Esri &mdash; Source: Esri, HERE, Garmin, USGS',
+        maxZoom: 19,
       }
     ).addTo(map)
 
