@@ -98,10 +98,14 @@
       #060b18;
   }
 
-  /* Leaflet z-index */
-  .leaflet-pane         { z-index: 10 !important; }
+  /* Leaflet z-index — 글래스 UI 아래로 */
+  .leaflet-container       { width: 100% !important; height: 100% !important; }
+  .leaflet-pane            { z-index: 10 !important; }
+  .leaflet-tile-pane       { z-index: 10 !important; }
+  .leaflet-overlay-pane    { z-index: 11 !important; }
+  .leaflet-marker-pane     { z-index: 12 !important; }
   .leaflet-top,
-  .leaflet-bottom       { z-index: 15 !important; }
+  .leaflet-bottom          { z-index: 15 !important; }
 
   /* 텍스트 그라디언트 — 주황 */
   .text-gradient {

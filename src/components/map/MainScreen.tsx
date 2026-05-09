@@ -43,10 +43,12 @@ export default function MainScreen() {
         </div>
       </div>
 
-      {/* 지도 영역 (flex-1로 남은 공간 차지) */}
-      <div className="relative flex-1 min-h-0 mx-4 rounded-3xl overflow-hidden z-10"
-        style={{ border: '1px solid var(--glass-border)' }}>
-        <MapView className="absolute inset-0 w-full h-full" />
+      {/* 지도 영역 */}
+      <div className="relative flex-1 min-h-0 mx-4 rounded-3xl z-10"
+        style={{ border: '1px solid var(--glass-border)', overflow: 'hidden' }}>
+        <div className="absolute inset-0">
+          <MapView className="w-full h-full" />
+        </div>
 
         {/* 현재 위치 버튼 */}
         <button
