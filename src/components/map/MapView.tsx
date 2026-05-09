@@ -2,14 +2,6 @@ import { useEffect, useRef } from 'react'
 import L from 'leaflet'
 import { useAppStore } from '../../store/appStore'
 
-// Leaflet 기본 마커 아이콘 수정
-delete (L.Icon.Default.prototype as any)._getIconUrl
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
-  iconUrl:       'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
-  shadowUrl:     'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
-})
-
 interface MapProps {
   className?: string
 }
@@ -22,38 +14,41 @@ export default function MapView({ className = '' }: MapProps) {
 
   const { session } = useAppStore()
 
-  // 지도 초기화
   useEffect(() => {
     if (!divRef.current || mapRef.current) return
 
     const map = L.map(divRef.current, {
-      center: [37.5665, 126.9780], // 서울 기본
+      center: [37.5665, 126.9780],
       zoom: 14,
       zoomControl: false,
       attributionControl: true,
     })
 
-    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap contributors',
-      maxZoom: 19,
-    }).addTo(map)
+    // Stadia Alidade Smooth Dark 타일
+    L.tileLayer(
+      'https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png',
+      {
+        attribution: '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="https://openstreetmap.org">OpenStreetMap</a>',
+        maxZoom: 20,
+      }
+    ).addTo(map)
 
-    // 줌 버튼 오른쪽 하단
+    // 줌 버튼
     L.control.zoom({ position: 'bottomright' }).addTo(map)
 
-    // 경로 라인
+    // 이동 경로 — 주황색
     lineRef.current = L.polyline([], {
-      color: '#22c55e',
-      weight: 4,
-      opacity: 0.85,
+      color:   '#e8650a',
+      weight:  4,
+      opacity: 0.9,
     }).addTo(map)
 
-    // 현재 위치 마커
+    // 현재 위치 마커 — 주황 glow
     markerRef.current = L.circleMarker([37.5665, 126.9780], {
-      radius: 10,
-      fillColor: '#16a34a',
-      color: '#ffffff',
-      weight: 3,
+      radius:      10,
+      fillColor:   '#e8650a',
+      color:       'rgba(232,101,10,0.3)',
+      weight:      8,
       fillOpacity: 1,
     }).addTo(map)
 

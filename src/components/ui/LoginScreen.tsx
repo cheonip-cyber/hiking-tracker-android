@@ -5,10 +5,10 @@ export default function LoginScreen() {
   const { login } = useAuth()
 
   const features = [
-    { icon: <MapPin className="w-4 h-4 text-green-400" />,    text: 'GPS 실시간 위치 추적' },
-    { icon: <Route className="w-4 h-4 text-green-400" />,     text: '등산로 기반 루트 자동 표기' },
-    { icon: <BarChart2 className="w-4 h-4 text-green-400" />, text: '거리 · 고도 · 속도 분석' },
-    { icon: <Mountain className="w-4 h-4 text-green-400" />,  text: '나만의 등산 기록 히스토리' },
+    { icon: <MapPin className="w-4 h-4 text-orange-400" />,    text: 'GPS 실시간 위치 추적' },
+    { icon: <Route className="w-4 h-4 text-orange-400" />,     text: '등산로 기반 루트 자동 표기' },
+    { icon: <BarChart2 className="w-4 h-4 text-orange-400" />, text: '거리 · 고도 · 속도 분석' },
+    { icon: <Mountain className="w-4 h-4 text-orange-400" />,  text: '나만의 등산 기록 히스토리' },
   ]
 
   return (
@@ -23,8 +23,8 @@ export default function LoginScreen() {
         <div className="relative mb-6">
           <div className="w-24 h-24 rounded-3xl flex items-center justify-center shadow-2xl"
             style={{
-              background: 'linear-gradient(135deg, #16a34a, #166534)',
-              boxShadow: '0 20px 60px rgba(74,222,128,0.3), 0 0 0 1px rgba(74,222,128,0.2)'
+              background: 'linear-gradient(135deg, #b84208, #7c2d06)',
+              boxShadow: '0 20px 60px rgba(220,100,10,0.30), 0 0 0 1px rgba(220,100,10,0.25)'
             }}>
             <Mountain className="w-12 h-12 text-white" />
           </div>
@@ -34,14 +34,14 @@ export default function LoginScreen() {
         </div>
 
         <h1 className="text-3xl font-bold text-gradient mb-2 tracking-tight">등산 트래커</h1>
-        <p className="text-green-400/50 text-sm mb-10">나만의 등산 기록을 시작하세요</p>
+        <p className="text-orange-400/50 text-sm mb-10">나만의 등산 기록을 시작하세요</p>
 
         {/* 기능 소개 */}
         <div className="w-full max-w-sm space-y-2.5 mb-10">
           {features.map((f, i) => (
             <div key={i} className="glass-hi rounded-2xl px-4 py-3 flex items-center gap-3">
               <div className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0"
-                style={{ background: 'rgba(34,197,94,0.15)' }}>
+                style={{ background: 'rgba(200,80,10,0.15)' }}>
                 {f.icon}
               </div>
               <span className="text-white/80 text-sm">{f.text}</span>
@@ -69,7 +69,7 @@ export default function LoginScreen() {
           Google로 시작하기
         </button>
 
-        <p className="text-green-400/25 text-xs text-center mt-4">
+        <p className="text-orange-400/25 text-xs text-center mt-4">
           로그인 시 이용약관 및 개인정보처리방침에 동의합니다
         </p>
       </div>

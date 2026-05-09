@@ -5,18 +5,19 @@
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap');
 
 :root {
-  /* 글래스모피즘 토큰 */
-  --glass-bg:        rgba(15, 35, 25, 0.55);
-  --glass-bg-light:  rgba(20, 50, 35, 0.45);
-  --glass-border:    rgba(80, 180, 120, 0.18);
-  --glass-border-hi: rgba(120, 220, 160, 0.30);
-  --glass-blur:      16px;
-  --glass-shadow:    0 8px 32px rgba(0, 0, 0, 0.40);
+  /* 글래스모피즘 토큰 — 네이비 베이스 */
+  --glass-bg:        rgba(8, 14, 32, 0.60);
+  --glass-bg-light:  rgba(12, 20, 45, 0.55);
+  --glass-border:    rgba(180, 100, 20, 0.18);
+  --glass-border-hi: rgba(210, 130, 40, 0.30);
+  --glass-blur:      18px;
+  --glass-shadow:    0 8px 32px rgba(0, 0, 0, 0.50);
 
-  /* 앱 컬러 */
-  --accent:          #4ade80;
-  --accent-dim:      #22c55e;
-  --accent-glow:     rgba(74, 222, 128, 0.25);
+  /* 앱 컬러 — 짙은 주황 accent */
+  --accent:          #e8650a;
+  --accent-dim:      #c2460a;
+  --accent-glow:     rgba(220, 90, 10, 0.28);
+  --accent-light:    rgba(232, 101, 10, 0.15);
 
   /* safe area */
   --sat: env(safe-area-inset-top,    0px);
@@ -33,12 +34,11 @@
 
   body {
     font-family: 'Noto Sans KR', sans-serif;
-    background: #071510;
-    color: #e8f5ee;
+    background: #060b18;
+    color: #e8eaf2;
     -webkit-font-smoothing: antialiased;
   }
 
-  /* iOS safe area */
   .pt-safe { padding-top: max(var(--sat), 1rem); }
   .pb-safe { padding-bottom: max(var(--sab), 1rem); }
 }
@@ -58,14 +58,14 @@
     backdrop-filter: blur(var(--glass-blur));
     -webkit-backdrop-filter: blur(var(--glass-blur));
     border: 1px solid var(--glass-border-hi);
-    box-shadow: var(--glass-shadow), inset 0 1px 0 rgba(255,255,255,0.06);
+    box-shadow: var(--glass-shadow), inset 0 1px 0 rgba(255,255,255,0.05);
   }
 
-  /* 버튼 기본 */
+  /* 버튼 */
   .btn-primary {
     @apply flex items-center justify-center gap-2 font-semibold rounded-2xl active:scale-95 transition-transform;
-    background: linear-gradient(135deg, #22c55e, #16a34a);
-    box-shadow: 0 4px 20px var(--accent-glow), 0 2px 8px rgba(0,0,0,0.3);
+    background: linear-gradient(135deg, #e8650a, #a83a06);
+    box-shadow: 0 4px 20px var(--accent-glow), 0 2px 8px rgba(0,0,0,0.4);
     color: white;
   }
 
@@ -75,27 +75,27 @@
     backdrop-filter: blur(var(--glass-blur));
     -webkit-backdrop-filter: blur(var(--glass-blur));
     border: 1px solid var(--glass-border);
-    color: #c8e6d4;
+    color: #c8cce0;
   }
 
   /* 통계 카드 */
   .stat-card {
     @apply flex flex-col items-center justify-center rounded-2xl py-3 px-2;
-    background: rgba(10, 30, 20, 0.6);
+    background: rgba(6, 10, 24, 0.65);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(74, 222, 128, 0.12);
+    border: 1px solid rgba(180, 100, 20, 0.14);
   }
 }
 
 @layer utilities {
-  /* 배경 그라디언트 메시 */
+  /* 배경 그라디언트 메시 — 네이비 */
   .bg-mesh {
     background:
-      radial-gradient(ellipse 80% 60% at 20% 10%, rgba(20, 80, 40, 0.45) 0%, transparent 60%),
-      radial-gradient(ellipse 60% 50% at 80% 80%, rgba(10, 50, 60, 0.35) 0%, transparent 55%),
-      radial-gradient(ellipse 50% 40% at 50% 50%, rgba(5, 25, 15, 0.5)  0%, transparent 70%),
-      #071510;
+      radial-gradient(ellipse 80% 55% at 15% 10%,  rgba(15, 25, 70, 0.55)  0%, transparent 60%),
+      radial-gradient(ellipse 60% 50% at 85% 85%,  rgba(30, 15, 60, 0.40)  0%, transparent 55%),
+      radial-gradient(ellipse 50% 40% at 50% 50%,  rgba(8,  12, 35, 0.55)  0%, transparent 70%),
+      #060b18;
   }
 
   /* Leaflet z-index */
@@ -103,9 +103,9 @@
   .leaflet-top,
   .leaflet-bottom       { z-index: 15 !important; }
 
-  /* 텍스트 그라디언트 */
+  /* 텍스트 그라디언트 — 주황 */
   .text-gradient {
-    background: linear-gradient(135deg, #86efac, #4ade80);
+    background: linear-gradient(135deg, #f59340, #e8650a);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -113,9 +113,9 @@
 
   /* 인풋 글래스 */
   .input-glass {
-    background: rgba(10, 30, 20, 0.6);
+    background: rgba(6, 10, 24, 0.65);
     border: 1px solid var(--glass-border);
-    color: #e8f5ee;
+    color: #e8eaf2;
     outline: none;
     transition: border-color 0.2s;
   }
@@ -123,10 +123,13 @@
     border-color: var(--accent-dim);
     box-shadow: 0 0 0 3px var(--accent-glow);
   }
-  .input-glass::placeholder { color: rgba(180, 220, 195, 0.4); }
+  .input-glass::placeholder { color: rgba(200, 204, 224, 0.35); }
 
   /* 구분선 */
-  .divider-glass {
-    border-color: var(--glass-border);
-  }
+  .divider-glass { border-color: var(--glass-border); }
+
+  /* accent 색상 유틸 */
+  .text-accent     { color: var(--accent); }
+  .text-accent-dim { color: var(--accent-dim); }
+  .bg-accent-light { background: var(--accent-light); }
 }

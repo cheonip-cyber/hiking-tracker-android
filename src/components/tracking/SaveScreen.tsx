@@ -66,12 +66,12 @@ export default function SaveScreen() {
       {/* 헤더 */}
       <div className="pt-safe px-4 pb-4">
         <div className="glass-hi rounded-3xl p-5 mt-2 text-center">
-          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center mx-auto mb-3 shadow-lg"
-            style={{ boxShadow: '0 8px 24px rgba(74,222,128,0.3)' }}>
+          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-orange-400 to-orange-700 flex items-center justify-center mx-auto mb-3 shadow-lg"
+            style={{ boxShadow: '0 8px 24px rgba(220,100,10,0.30)' }}>
             <Mountain className="w-7 h-7 text-white" />
           </div>
           <h1 className="text-xl font-bold text-gradient mb-1">등산 완료!</h1>
-          <p className="text-green-400/50 text-sm">{date}</p>
+          <p className="text-orange-400/50 text-sm">{date}</p>
         </div>
       </div>
 
@@ -79,11 +79,11 @@ export default function SaveScreen() {
 
         {/* 결과 요약 */}
         <div className="glass rounded-3xl p-4">
-          <p className="text-green-400/50 text-xs font-semibold uppercase tracking-widest mb-3">결과 요약</p>
+          <p className="text-orange-400/50 text-xs font-semibold uppercase tracking-widest mb-3">결과 요약</p>
           <div className="grid grid-cols-2 gap-2">
             {stats.map((s) => (
               <div key={s.label} className="stat-card py-2.5">
-                <span className="text-green-400/40 text-xs">{s.label}</span>
+                <span className="text-orange-400/40 text-xs">{s.label}</span>
                 <span className="text-white font-semibold text-sm mt-0.5">{s.value}</span>
               </div>
             ))}
@@ -94,12 +94,12 @@ export default function SaveScreen() {
         <div className="glass rounded-3xl p-4">
           <div className="flex items-center justify-between mb-2.5">
             <div className="flex items-center gap-1.5">
-              <MapPin className="w-3.5 h-3.5 text-green-400" />
-              <p className="text-green-400/50 text-xs font-semibold uppercase tracking-widest">이동 루트</p>
+              <MapPin className="w-3.5 h-3.5 text-orange-400" />
+              <p className="text-orange-400/50 text-xs font-semibold uppercase tracking-widest">이동 루트</p>
             </div>
             <button
               onClick={() => setEditingRoute(!editingRoute)}
-              className="flex items-center gap-1 text-green-400/60 text-xs active:text-green-300 transition-colors"
+              className="flex items-center gap-1 text-orange-400/60 text-xs active:text-orange-300 transition-colors"
             >
               <Edit2 className="w-3 h-3" />
               {editingRoute ? '완료' : '편집'}
@@ -107,7 +107,7 @@ export default function SaveScreen() {
           </div>
 
           {isGenerating ? (
-            <div className="flex items-center gap-2 text-green-400/50 text-sm py-1">
+            <div className="flex items-center gap-2 text-orange-400/50 text-sm py-1">
               <Loader className="w-4 h-4 animate-spin" />
               <span>루트 자동 생성 중...</span>
             </div>
@@ -122,7 +122,7 @@ export default function SaveScreen() {
           ) : (
             <p className="text-white/80 text-sm leading-relaxed">
               {routeEdited || routeAuto || (
-                <span className="text-green-400/30">편집 버튼으로 직접 입력해주세요</span>
+                <span className="text-orange-400/30">편집 버튼으로 직접 입력해주세요</span>
               )}
             </p>
           )}
@@ -130,7 +130,7 @@ export default function SaveScreen() {
 
         {/* 메모 */}
         <div className="glass rounded-3xl p-4">
-          <p className="text-green-400/50 text-xs font-semibold uppercase tracking-widest mb-2.5">메모</p>
+          <p className="text-orange-400/50 text-xs font-semibold uppercase tracking-widest mb-2.5">메모</p>
           <textarea
             value={memo}
             onChange={(e) => setMemo(e.target.value)}

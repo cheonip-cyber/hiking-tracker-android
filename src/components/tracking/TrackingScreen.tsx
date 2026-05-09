@@ -40,10 +40,10 @@ export default function TrackingScreen() {
         {/* 상태 배지 */}
         <div className="absolute top-safe left-1/2 -translate-x-1/2 z-10 mt-3">
           <div className={`glass-hi px-4 py-1.5 rounded-full flex items-center gap-2 ${
-            isTracking ? 'border-green-400/30' : 'border-amber-400/30'
+            isTracking ? 'border-orange-500/30' : 'border-amber-400/30'
           }`}>
             <span className={`w-2 h-2 rounded-full ${
-              isTracking ? 'bg-green-400 animate-pulse' : 'bg-amber-400'
+              isTracking ? 'bg-orange-400 animate-pulse' : 'bg-amber-400'
             }`} />
             <span className="text-xs font-semibold text-white">
               {isTracking ? '기록 중' : '일시정지'}
@@ -60,7 +60,7 @@ export default function TrackingScreen() {
         >
           {lowBattery
             ? <ZapOff className="w-4 h-4 text-amber-400" />
-            : <Zap className="w-4 h-4 text-green-300" />
+            : <Zap className="w-4 h-4 text-orange-300" />
           }
         </button>
       </div>
@@ -73,10 +73,10 @@ export default function TrackingScreen() {
 
         {/* 메인 타이머 */}
         <div className="text-center mb-3">
-          <p className="text-xs text-green-400/50 font-medium tracking-widest uppercase mb-1">소요 시간</p>
+          <p className="text-xs text-orange-400/50 font-medium tracking-widest uppercase mb-1">소요 시간</p>
           <p className="font-bold tracking-tight" style={{
             fontSize: 'clamp(2.5rem, 12vw, 3.5rem)',
-            background: 'linear-gradient(135deg, #86efac, #4ade80)',
+            background: 'linear-gradient(135deg, #fbbf80, #e8650a)',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
             backgroundClip: 'text'
@@ -101,8 +101,8 @@ export default function TrackingScreen() {
         {/* GPS 상태 */}
         {isTracking && (
           <div className="flex items-center justify-center gap-1.5 mb-3">
-            <Activity className="w-3 h-3 text-green-400/60" />
-            <p className="text-green-400/50 text-xs">GPS 수신 중 · 화면을 켜두세요</p>
+            <Activity className="w-3 h-3 text-orange-400/60" />
+            <p className="text-orange-400/50 text-xs">GPS 수신 중 · 화면을 켜두세요</p>
           </div>
         )}
 
@@ -114,8 +114,8 @@ export default function TrackingScreen() {
             style={{ height: '3.25rem' }}
           >
             {isTracking
-              ? <><Pause className="w-4 h-4 text-green-400" /><span>일시정지</span></>
-              : <><Play  className="w-4 h-4 text-green-400" /><span>재개</span></>
+              ? <><Pause className="w-4 h-4 text-orange-400" /><span>일시정지</span></>
+              : <><Play  className="w-4 h-4 text-orange-400" /><span>재개</span></>
             }
           </button>
           <button
@@ -141,11 +141,11 @@ function StatCard({ label, value, unit, accent, small }: {
 }) {
   return (
     <div className="stat-card">
-      <span className="text-green-400/50 text-xs mb-0.5">{label}</span>
+      <span className="text-orange-400/50 text-xs mb-0.5">{label}</span>
       <span className={`font-bold leading-none ${small ? 'text-base' : 'text-xl'} ${accent ? 'text-gradient' : 'text-white'}`}>
         {value}
       </span>
-      {unit && <span className="text-green-400/40 text-xs mt-0.5">{unit}</span>}
+      {unit && <span className="text-orange-400/40 text-xs mt-0.5">{unit}</span>}
     </div>
   )
 }

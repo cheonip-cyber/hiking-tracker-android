@@ -56,10 +56,10 @@ export default function HikeDetailScreen() {
   }
 
   if (loading) return (
-    <div className="min-h-screen bg-mesh flex items-center justify-center text-green-400/40 text-sm">불러오는 중...</div>
+    <div className="min-h-screen bg-mesh flex items-center justify-center text-orange-400/40 text-sm">불러오는 중...</div>
   )
   if (!hike) return (
-    <div className="min-h-screen bg-mesh flex items-center justify-center text-green-400/40 text-sm">기록을 찾을 수 없습니다</div>
+    <div className="min-h-screen bg-mesh flex items-center justify-center text-orange-400/40 text-sm">기록을 찾을 수 없습니다</div>
   )
 
   const displayRoute = hike.routeEdited || hike.routeAuto
@@ -80,7 +80,7 @@ export default function HikeDetailScreen() {
         <div className="flex items-center justify-between mt-3">
           <button onClick={() => navigate(-1)}
             className="w-9 h-9 glass-hi rounded-xl flex items-center justify-center active:scale-90 transition-transform">
-            <ArrowLeft className="w-4 h-4 text-green-300" />
+            <ArrowLeft className="w-4 h-4 text-orange-300" />
           </button>
           <div className="text-center">
             <p className="text-gradient font-bold text-base">{formatDate(hike.date)}</p>
@@ -97,12 +97,12 @@ export default function HikeDetailScreen() {
 
         {/* 루트 */}
         <Section
-          icon={<MapPin className="w-3.5 h-3.5 text-green-400" />}
+          icon={<MapPin className="w-3.5 h-3.5 text-orange-400" />}
           title="이동 루트"
           action={
             editingRoute
-              ? <button onClick={handleSaveRoute} className="flex items-center gap-1 text-green-400 text-xs"><Check className="w-3 h-3" />저장</button>
-              : <button onClick={() => setEditingRoute(true)} className="flex items-center gap-1 text-green-400/50 text-xs"><Edit2 className="w-3 h-3" />편집</button>
+              ? <button onClick={handleSaveRoute} className="flex items-center gap-1 text-orange-400 text-xs"><Check className="w-3 h-3" />저장</button>
+              : <button onClick={() => setEditingRoute(true)} className="flex items-center gap-1 text-orange-400/50 text-xs"><Edit2 className="w-3 h-3" />편집</button>
           }
         >
           {editingRoute ? (
@@ -110,17 +110,17 @@ export default function HikeDetailScreen() {
               className="input-glass w-full rounded-xl px-3 py-2 text-sm resize-none" rows={2} />
           ) : (
             <p className="text-white/80 text-sm leading-relaxed">
-              {displayRoute || <span className="text-green-400/30">루트 미입력</span>}
+              {displayRoute || <span className="text-orange-400/30">루트 미입력</span>}
             </p>
           )}
         </Section>
 
         {/* 통계 */}
-        <Section icon={<BarChart2 className="w-3.5 h-3.5 text-green-400" />} title="통계">
+        <Section icon={<BarChart2 className="w-3.5 h-3.5 text-orange-400" />} title="통계">
           <div className="grid grid-cols-2 gap-2">
             {stats.map(s => (
               <div key={s.label} className="stat-card py-2.5">
-                <span className="text-green-400/40 text-xs">{s.label}</span>
+                <span className="text-orange-400/40 text-xs">{s.label}</span>
                 <span className="text-white font-semibold text-sm mt-0.5">{s.value}</span>
               </div>
             ))}
@@ -129,12 +129,12 @@ export default function HikeDetailScreen() {
 
         {/* 메모 */}
         <Section
-          icon={<Mountain className="w-3.5 h-3.5 text-green-400" />}
+          icon={<Mountain className="w-3.5 h-3.5 text-orange-400" />}
           title="메모"
           action={
             editingMemo
-              ? <button onClick={handleSaveMemo} className="flex items-center gap-1 text-green-400 text-xs"><Check className="w-3 h-3" />저장</button>
-              : <button onClick={() => setEditingMemo(true)} className="flex items-center gap-1 text-green-400/50 text-xs"><Edit2 className="w-3 h-3" />편집</button>
+              ? <button onClick={handleSaveMemo} className="flex items-center gap-1 text-orange-400 text-xs"><Check className="w-3 h-3" />저장</button>
+              : <button onClick={() => setEditingMemo(true)} className="flex items-center gap-1 text-orange-400/50 text-xs"><Edit2 className="w-3 h-3" />편집</button>
           }
         >
           {editingMemo ? (
@@ -142,7 +142,7 @@ export default function HikeDetailScreen() {
               className="input-glass w-full rounded-xl px-3 py-2 text-sm resize-none" rows={3} />
           ) : (
             <p className="text-white/80 text-sm leading-relaxed whitespace-pre-wrap">
-              {hike.memo || <span className="text-green-400/30">메모 없음</span>}
+              {hike.memo || <span className="text-orange-400/30">메모 없음</span>}
             </p>
           )}
         </Section>
@@ -159,7 +159,7 @@ function Section({ icon, title, action, children }: {
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-1.5">
           {icon}
-          <p className="text-green-400/50 text-xs font-semibold uppercase tracking-widest">{title}</p>
+          <p className="text-orange-400/50 text-xs font-semibold uppercase tracking-widest">{title}</p>
         </div>
         {action}
       </div>

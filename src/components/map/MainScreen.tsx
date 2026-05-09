@@ -20,7 +20,7 @@ export default function MainScreen() {
       <div className="flex-shrink-0 pt-safe px-4 pb-2 z-20">
         <div className="glass-hi rounded-2xl px-4 py-3 flex items-center justify-between mt-2">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center shadow-lg">
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-orange-400 to-orange-700 flex items-center justify-center shadow-lg">
               <Mountain className="w-4 h-4 text-white" />
             </div>
             <div>
@@ -35,8 +35,8 @@ export default function MainScreen() {
           >
             {user?.photoURL
               ? <img src={user.photoURL} alt="프로필" className="w-full h-full object-cover" />
-              : <div className="w-full h-full bg-green-900/60 flex items-center justify-center">
-                  <User className="w-4 h-4 text-green-300" />
+              : <div className="w-full h-full bg-navy-900/60 flex items-center justify-center">
+                  <User className="w-4 h-4 text-orange-300" />
                 </div>
             }
           </button>
@@ -55,7 +55,7 @@ export default function MainScreen() {
             navigator.geolocation?.getCurrentPosition(() => {})
           }}
         >
-          <Navigation className="w-5 h-5 text-green-300" />
+          <Navigation className="w-5 h-5 text-orange-300" />
         </button>
       </div>
 
@@ -64,7 +64,7 @@ export default function MainScreen() {
         <div className="glass rounded-3xl p-4 mb-2">
 
           {/* 오늘 날짜 */}
-          <p className="text-green-400/50 text-xs text-center mb-3 font-medium tracking-widest uppercase">
+          <p className="text-orange-400/50 text-xs text-center mb-3 font-medium tracking-widest uppercase">
             {new Date().toLocaleDateString('ko-KR', { month: 'long', day: 'numeric', weekday: 'short' })}
           </p>
 
@@ -74,7 +74,7 @@ export default function MainScreen() {
               onClick={() => navigate('/history')}
               className="btn-glass flex-1 h-14 text-sm"
             >
-              <History className="w-4 h-4 text-green-400" />
+              <History className="w-4 h-4 text-orange-400" />
               <span>기록</span>
             </button>
 
