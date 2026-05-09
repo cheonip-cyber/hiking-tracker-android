@@ -2,25 +2,131 @@
 @tailwind components;
 @tailwind utilities;
 
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap');
+
+:root {
+  /* 글래스모피즘 토큰 */
+  --glass-bg:        rgba(15, 35, 25, 0.55);
+  --glass-bg-light:  rgba(20, 50, 35, 0.45);
+  --glass-border:    rgba(80, 180, 120, 0.18);
+  --glass-border-hi: rgba(120, 220, 160, 0.30);
+  --glass-blur:      16px;
+  --glass-shadow:    0 8px 32px rgba(0, 0, 0, 0.40);
+
+  /* 앱 컬러 */
+  --accent:          #4ade80;
+  --accent-dim:      #22c55e;
+  --accent-glow:     rgba(74, 222, 128, 0.25);
+
+  /* safe area */
+  --sat: env(safe-area-inset-top,    0px);
+  --sab: env(safe-area-inset-bottom, 0px);
+}
+
 @layer base {
   html, body, #root {
     height: 100%;
     overscroll-behavior: none;
     -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
   }
 
   body {
-    @apply bg-forest-950 text-white font-sans;
+    font-family: 'Noto Sans KR', sans-serif;
+    background: #071510;
+    color: #e8f5ee;
     -webkit-font-smoothing: antialiased;
   }
 
   /* iOS safe area */
-  .pt-safe { padding-top: env(safe-area-inset-top, 1rem); }
-  .pb-safe { padding-bottom: env(safe-area-inset-bottom, 1rem); }
+  .pt-safe { padding-top: max(var(--sat), 1rem); }
+  .pb-safe { padding-bottom: max(var(--sab), 1rem); }
+}
+
+@layer components {
+  /* 글래스 카드 */
+  .glass {
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+  }
+
+  .glass-hi {
+    background: var(--glass-bg-light);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--glass-border-hi);
+    box-shadow: var(--glass-shadow), inset 0 1px 0 rgba(255,255,255,0.06);
+  }
+
+  /* 버튼 기본 */
+  .btn-primary {
+    @apply flex items-center justify-center gap-2 font-semibold rounded-2xl active:scale-95 transition-transform;
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    box-shadow: 0 4px 20px var(--accent-glow), 0 2px 8px rgba(0,0,0,0.3);
+    color: white;
+  }
+
+  .btn-glass {
+    @apply flex items-center justify-center gap-2 font-medium rounded-2xl active:scale-95 transition-transform;
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--glass-border);
+    color: #c8e6d4;
+  }
+
+  /* 통계 카드 */
+  .stat-card {
+    @apply flex flex-col items-center justify-center rounded-2xl py-3 px-2;
+    background: rgba(10, 30, 20, 0.6);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(74, 222, 128, 0.12);
+  }
 }
 
 @layer utilities {
-  /* Leaflet z-index 조정 */
-  .leaflet-pane { z-index: 10 !important; }
-  .leaflet-top, .leaflet-bottom { z-index: 15 !important; }
+  /* 배경 그라디언트 메시 */
+  .bg-mesh {
+    background:
+      radial-gradient(ellipse 80% 60% at 20% 10%, rgba(20, 80, 40, 0.45) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 50% at 80% 80%, rgba(10, 50, 60, 0.35) 0%, transparent 55%),
+      radial-gradient(ellipse 50% 40% at 50% 50%, rgba(5, 25, 15, 0.5)  0%, transparent 70%),
+      #071510;
+  }
+
+  /* Leaflet z-index */
+  .leaflet-pane         { z-index: 10 !important; }
+  .leaflet-top,
+  .leaflet-bottom       { z-index: 15 !important; }
+
+  /* 텍스트 그라디언트 */
+  .text-gradient {
+    background: linear-gradient(135deg, #86efac, #4ade80);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* 인풋 글래스 */
+  .input-glass {
+    background: rgba(10, 30, 20, 0.6);
+    border: 1px solid var(--glass-border);
+    color: #e8f5ee;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .input-glass:focus {
+    border-color: var(--accent-dim);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+  }
+  .input-glass::placeholder { color: rgba(180, 220, 195, 0.4); }
+
+  /* 구분선 */
+  .divider-glass {
+    border-color: var(--glass-border);
+  }
 }

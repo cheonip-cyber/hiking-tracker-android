@@ -1,7 +1,8 @@
 import { useNavigate } from 'react-router-dom'
-import { Mountain, History, User, Navigation } from 'lucide-react'
+import { Mountain, History, Navigation, User } from 'lucide-react'
 import MapView from '../map/MapView'
 import { useAppStore } from '../../store/appStore'
+import { FIREBASE_ENABLED } from '../../services/firebase'
 
 export default function MainScreen() {
   const navigate = useNavigate()
@@ -13,61 +14,83 @@ export default function MainScreen() {
   }
 
   return (
-    <div className="relative w-full h-screen flex flex-col bg-forest-950 overflow-hidden">
-      {/* 헤더 */}
-      <div className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between px-4 pt-safe pb-2 bg-gradient-to-b from-forest-950/90 to-transparent">
-        <div className="flex items-center gap-2">
-          <Mountain className="w-6 h-6 text-forest-400" />
-          <span className="text-white font-semibold text-lg tracking-tight">등산 트래커</span>
+    <div className="relative w-full h-screen bg-mesh overflow-hidden">
+
+      {/* 배경 지도 (전체 화면) */}
+      <div className="absolute inset-0">
+        <MapView className="w-full h-full" />
+      </div>
+
+      {/* 상단 헤더 */}
+      <div className="absolute top-0 left-0 right-0 z-20 pt-safe px-4 pb-3">
+        <div className="glass-hi rounded-2xl px-4 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center shadow-lg">
+              <Mountain className="w-4 h-4 text-white" />
+            </div>
+            <div>
+              <p className="text-gradient font-bold text-base leading-tight">등산 트래커</p>
+              <p className="text-green-400/60 text-xs">
+                {FIREBASE_ENABLED ? '클라우드 연동' : '로컬 저장 모드'}
+              </p>
+            </div>
+          </div>
+
+          <button
+            onClick={() => navigate('/profile')}
+            className="w-9 h-9 rounded-full overflow-hidden border-2 flex items-center justify-center transition-transform active:scale-90"
+            style={{ borderColor: 'var(--glass-border-hi)' }}
+          >
+            {user?.photoURL
+              ? <img src={user.photoURL} alt="프로필" className="w-full h-full object-cover" />
+              : <div className="w-full h-full bg-green-900/60 flex items-center justify-center">
+                  <User className="w-4 h-4 text-green-300" />
+                </div>
+            }
+          </button>
         </div>
-        <button
-          onClick={() => navigate('/profile')}
-          className="w-9 h-9 rounded-full overflow-hidden border-2 border-forest-500 flex items-center justify-center bg-forest-800"
-        >
-          {user?.photoURL
-            ? <img src={user.photoURL} alt="프로필" className="w-full h-full object-cover" />
-            : <User className="w-5 h-5 text-forest-300" />
-          }
-        </button>
       </div>
 
-      {/* 지도 */}
-      <div className="flex-1 relative">
-        <MapView className="absolute inset-0" />
+      {/* 현재 위치 버튼 */}
+      <button
+        className="absolute right-4 z-20 glass-hi w-11 h-11 rounded-2xl flex items-center justify-center active:scale-90 transition-transform"
+        style={{ top: '50%', transform: 'translateY(-50%)' }}
+        onClick={() => {
+          navigator.geolocation?.getCurrentPosition((pos) => {
+            // MapView 내부에서 처리
+          })
+        }}
+      >
+        <Navigation className="w-5 h-5 text-green-300" />
+      </button>
 
-        {/* 현재 위치 버튼 */}
-        <button
-          onClick={() => {
-            navigator.geolocation?.getCurrentPosition((pos) => {
-              // MapView 내부에서 처리 - 이벤트로 연결 필요 시 ref 사용
-            })
-          }}
-          className="absolute right-4 top-1/2 -translate-y-1/2 z-10 w-11 h-11 rounded-full bg-white shadow-lg flex items-center justify-center active:scale-95 transition-transform"
-        >
-          <Navigation className="w-5 h-5 text-forest-700" />
-        </button>
-      </div>
+      {/* 하단 액션 패널 */}
+      <div className="absolute bottom-0 left-0 right-0 z-20 pb-safe px-4 pt-2">
+        <div className="glass rounded-3xl p-4 mb-2">
 
-      {/* 하단 버튼 영역 */}
-      <div className="relative z-20 bg-gradient-to-t from-forest-950 to-transparent pt-8 pb-safe px-6">
-        <div className="flex items-center gap-4 mb-6">
-          {/* 히스토리 */}
-          <button
-            onClick={() => navigate('/history')}
-            className="flex-1 h-14 rounded-2xl bg-forest-800/80 border border-forest-700 flex items-center justify-center gap-2 text-forest-200 font-medium active:scale-95 transition-transform"
-          >
-            <History className="w-5 h-5" />
-            <span>기록</span>
-          </button>
+          {/* 오늘 날짜 */}
+          <p className="text-green-400/50 text-xs text-center mb-3 font-medium tracking-widest uppercase">
+            {new Date().toLocaleDateString('ko-KR', { month: 'long', day: 'numeric', weekday: 'short' })}
+          </p>
 
-          {/* 시작 버튼 */}
-          <button
-            onClick={handleStart}
-            className="flex-[2] h-14 rounded-2xl bg-forest-500 flex items-center justify-center gap-2 text-white font-bold text-lg shadow-lg shadow-forest-900/50 active:scale-95 transition-transform"
-          >
-            <Mountain className="w-6 h-6" />
-            <span>등산 시작</span>
-          </button>
+          {/* 버튼 그룹 */}
+          <div className="flex gap-3">
+            <button
+              onClick={() => navigate('/history')}
+              className="btn-glass flex-1 h-14 text-sm"
+            >
+              <History className="w-4 h-4 text-green-400" />
+              <span>기록</span>
+            </button>
+
+            <button
+              onClick={handleStart}
+              className="btn-primary flex-[2] h-14 text-base"
+            >
+              <Mountain className="w-5 h-5" />
+              <span className="font-bold">등산 시작</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>

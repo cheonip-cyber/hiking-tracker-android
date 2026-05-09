@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Pause, Play, Square, Zap, ZapOff } from 'lucide-react'
+import { Pause, Play, Square, Zap, ZapOff, Activity } from 'lucide-react'
 import MapView from '../map/MapView'
 import { useAppStore } from '../../store/appStore'
 import { useGpsTracking } from '../../hooks/useGpsTracking'
@@ -9,107 +9,125 @@ import { formatDuration } from '../../utils/gps'
 export default function TrackingScreen() {
   const navigate = useNavigate()
   const { session, pauseTracking, resumeTracking, stopTracking, updateSettings, user } = useAppStore()
-  const { } = useGpsTracking()
+  useGpsTracking()
 
   const [elapsed, setElapsed] = useState(0)
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const lowBattery = user?.settings?.lowBatteryMode ?? false
 
-  // 타이머
   useEffect(() => {
     timerRef.current = setInterval(() => {
       if (session.status !== 'tracking' || !session.startTime) return
-      const raw = Date.now() - session.startTime - session.totalPausedMs
-      setElapsed(Math.floor(raw / 1000))
+      setElapsed(Math.floor((Date.now() - session.startTime - session.totalPausedMs) / 1000))
     }, 1000)
     return () => { if (timerRef.current) clearInterval(timerRef.current) }
   }, [session.status, session.startTime, session.totalPausedMs])
 
-  const handleStop = () => {
-    stopTracking()
-    navigate('/save')
+  const handleStop = () => { stopTracking(); navigate('/save') }
+  const handlePauseResume = () => {
+    session.status === 'tracking' ? pauseTracking() : resumeTracking()
   }
 
-  const handlePauseResume = () => {
-    if (session.status === 'tracking') pauseTracking()
-    else resumeTracking()
-  }
+  const isTracking = session.status === 'tracking'
 
   return (
-    <div className="relative w-full h-screen flex flex-col bg-forest-950 overflow-hidden">
+    <div className="relative w-full h-screen bg-mesh overflow-hidden flex flex-col">
 
-      {/* 지도 (상단 60%) */}
-      <div className="relative" style={{ height: '58vh' }}>
-        <MapView className="absolute inset-0" />
+      {/* 지도 (상단 55%) */}
+      <div className="relative flex-1 min-h-0">
+        <MapView className="absolute inset-0 w-full h-full" />
 
         {/* 상태 배지 */}
-        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10">
-          <span className={`px-4 py-1.5 rounded-full text-sm font-semibold flex items-center gap-1.5 ${
-            session.status === 'tracking'
-              ? 'bg-forest-500 text-white'
-              : 'bg-amber-500 text-white'
+        <div className="absolute top-safe left-1/2 -translate-x-1/2 z-10 mt-3">
+          <div className={`glass-hi px-4 py-1.5 rounded-full flex items-center gap-2 ${
+            isTracking ? 'border-green-400/30' : 'border-amber-400/30'
           }`}>
             <span className={`w-2 h-2 rounded-full ${
-              session.status === 'tracking' ? 'bg-white animate-pulse' : 'bg-white'
+              isTracking ? 'bg-green-400 animate-pulse' : 'bg-amber-400'
             }`} />
-            {session.status === 'tracking' ? '기록 중' : '일시정지'}
-          </span>
+            <span className="text-xs font-semibold text-white">
+              {isTracking ? '기록 중' : '일시정지'}
+            </span>
+          </div>
         </div>
 
-        {/* 저전력 모드 토글 */}
+        {/* 저전력 토글 */}
         <button
           onClick={() => updateSettings({ lowBatteryMode: !lowBattery })}
-          className={`absolute top-4 right-4 z-10 w-10 h-10 rounded-full flex items-center justify-center shadow-md ${
-            lowBattery ? 'bg-amber-500' : 'bg-white/90'
+          className={`absolute top-4 right-4 z-10 w-10 h-10 rounded-xl glass-hi flex items-center justify-center active:scale-90 transition-transform ${
+            lowBattery ? 'border-amber-400/40' : ''
           }`}
-          title={lowBattery ? '저전력 모드 ON' : '저전력 모드 OFF'}
         >
           {lowBattery
-            ? <ZapOff className="w-4 h-4 text-white" />
-            : <Zap className="w-4 h-4 text-forest-700" />
+            ? <ZapOff className="w-4 h-4 text-amber-400" />
+            : <Zap className="w-4 h-4 text-green-300" />
           }
         </button>
       </div>
 
-      {/* 통계 패널 (하단 42%) */}
-      <div className="flex-1 bg-forest-950 px-4 pt-4 pb-safe flex flex-col">
+      {/* 통계 패널 (하단 45%) */}
+      <div className="z-10 pb-safe px-4 pt-3" style={{
+        background: 'linear-gradient(to top, rgba(5,18,10,0.98) 70%, transparent)',
+        minHeight: '42vh'
+      }}>
 
-        {/* 핵심 지표 */}
-        <div className="grid grid-cols-3 gap-3 mb-4">
-          <StatCard label="거리" value={`${session.distance.toFixed(2)}`} unit="km" />
-          <StatCard label="시간" value={formatDuration(elapsed)} unit="" large />
-          <StatCard label="고도" value={`${session.currentPoint?.alt?.toFixed(0) ?? 0}`} unit="m" />
-        </div>
-
-        <div className="grid grid-cols-3 gap-3 mb-6">
-          <StatCard label="최고 고도" value={`${session.maxElevation}`} unit="m" small />
-          <StatCard label="상승" value={`${session.elevationGain}`} unit="m" small />
-          <StatCard label="평균 속도" value={`${session.avgSpeed.toFixed(1)}`} unit="km/h" small />
-        </div>
-
-        {/* Wake Lock 안내 */}
-        {session.status === 'tracking' && (
-          <p className="text-center text-forest-500 text-xs mb-4">
-            GPS 정확도를 위해 화면을 켜두세요
+        {/* 메인 타이머 */}
+        <div className="text-center mb-3">
+          <p className="text-xs text-green-400/50 font-medium tracking-widest uppercase mb-1">소요 시간</p>
+          <p className="font-bold tracking-tight" style={{
+            fontSize: 'clamp(2.5rem, 12vw, 3.5rem)',
+            background: 'linear-gradient(135deg, #86efac, #4ade80)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text'
+          }}>
+            {formatDuration(elapsed)}
           </p>
+        </div>
+
+        {/* 핵심 3개 지표 */}
+        <div className="grid grid-cols-3 gap-2 mb-2">
+          <StatCard label="거리" value={session.distance.toFixed(2)} unit="km" accent />
+          <StatCard label="현재 고도" value={String(session.currentPoint?.alt?.toFixed(0) ?? 0)} unit="m" />
+          <StatCard label="평균 속도" value={session.avgSpeed.toFixed(1)} unit="km/h" />
+        </div>
+
+        {/* 보조 2개 지표 */}
+        <div className="grid grid-cols-2 gap-2 mb-4">
+          <StatCard label="최고 고도" value={String(session.maxElevation)} unit="m" small />
+          <StatCard label="누적 상승" value={String(session.elevationGain)} unit="m" small />
+        </div>
+
+        {/* GPS 상태 */}
+        {isTracking && (
+          <div className="flex items-center justify-center gap-1.5 mb-3">
+            <Activity className="w-3 h-3 text-green-400/60" />
+            <p className="text-green-400/50 text-xs">GPS 수신 중 · 화면을 켜두세요</p>
+          </div>
         )}
 
-        {/* 컨트롤 버튼 */}
-        <div className="flex items-center gap-4 mt-auto">
+        {/* 컨트롤 */}
+        <div className="flex gap-3">
           <button
             onClick={handlePauseResume}
-            className="flex-1 h-14 rounded-2xl bg-forest-800 border border-forest-700 flex items-center justify-center gap-2 text-forest-200 font-semibold active:scale-95 transition-transform"
+            className="btn-glass flex-1 h-13 text-sm"
+            style={{ height: '3.25rem' }}
           >
-            {session.status === 'tracking'
-              ? <><Pause className="w-5 h-5" /><span>일시정지</span></>
-              : <><Play className="w-5 h-5" /><span>재개</span></>
+            {isTracking
+              ? <><Pause className="w-4 h-4 text-green-400" /><span>일시정지</span></>
+              : <><Play  className="w-4 h-4 text-green-400" /><span>재개</span></>
             }
           </button>
           <button
             onClick={handleStop}
-            className="flex-1 h-14 rounded-2xl bg-red-600 flex items-center justify-center gap-2 text-white font-bold active:scale-95 transition-transform"
+            className="flex-1 flex items-center justify-center gap-2 rounded-2xl font-semibold text-white active:scale-95 transition-transform"
+            style={{
+              height: '3.25rem',
+              background: 'linear-gradient(135deg, #dc2626, #991b1b)',
+              boxShadow: '0 4px 20px rgba(220,38,38,0.3)'
+            }}
           >
-            <Square className="w-5 h-5" />
+            <Square className="w-4 h-4" />
             <span>종료</span>
           </button>
         </div>
@@ -118,18 +136,16 @@ export default function TrackingScreen() {
   )
 }
 
-function StatCard({
-  label, value, unit, large, small
-}: {
-  label: string, value: string, unit: string, large?: boolean, small?: boolean
+function StatCard({ label, value, unit, accent, small }: {
+  label: string; value: string; unit: string; accent?: boolean; small?: boolean
 }) {
   return (
-    <div className="bg-forest-900 rounded-2xl p-3 flex flex-col items-center justify-center">
-      <span className="text-forest-400 text-xs mb-1">{label}</span>
-      <span className={`text-white font-bold leading-none ${large ? 'text-2xl' : small ? 'text-lg' : 'text-xl'}`}>
+    <div className="stat-card">
+      <span className="text-green-400/50 text-xs mb-0.5">{label}</span>
+      <span className={`font-bold leading-none ${small ? 'text-base' : 'text-xl'} ${accent ? 'text-gradient' : 'text-white'}`}>
         {value}
       </span>
-      {unit && <span className="text-forest-400 text-xs mt-0.5">{unit}</span>}
+      {unit && <span className="text-green-400/40 text-xs mt-0.5">{unit}</span>}
     </div>
   )
 }

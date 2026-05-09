@@ -52,14 +52,19 @@ export default function App() {
     <BrowserRouter>
       {/* v1 모드 안내 배너 */}
       {!FIREBASE_ENABLED && (
-        <div className="fixed top-0 left-0 right-0 z-50 bg-forest-700 text-white text-center text-xs py-1.5 font-medium">
-          로컬 저장 모드 (v1) · 기록은 이 기기에만 저장됩니다
+        <div className="fixed top-0 left-0 right-0 z-50 flex justify-center pt-safe pointer-events-none">
+          <div className="glass-hi mx-4 mt-2 px-4 py-1.5 rounded-full text-xs text-green-300/70 font-medium">
+            📱 로컬 저장 모드 · 기록은 이 기기에만 저장됩니다
+          </div>
         </div>
       )}
       {/* 오프라인 배너 */}
       {!isOnline && (
-        <div className="fixed top-0 left-0 right-0 z-50 bg-amber-500 text-white text-center text-xs py-1.5 font-medium">
-          오프라인 모드 · 기록은 로컬에 저장됩니다
+        <div className="fixed top-0 left-0 right-0 z-50 flex justify-center pt-safe pointer-events-none">
+          <div className="mx-4 mt-2 px-4 py-1.5 rounded-full text-xs text-amber-300 font-medium"
+            style={{ background: 'rgba(180,100,0,0.7)', backdropFilter: 'blur(12px)', border: '1px solid rgba(251,191,36,0.3)' }}>
+            ⚡ 오프라인 · 기록은 로컬에 저장됩니다
+          </div>
         </div>
       )}
       <AppRoutes />
