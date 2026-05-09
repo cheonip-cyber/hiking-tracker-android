@@ -24,13 +24,15 @@ export default function MapView({ className = '' }: MapProps) {
       attributionControl: true,
     })
 
-    // CartoDB Dark Matter — API 키 불필요, 완전 무료
+    // 카카오맵 타일 (비공식, 개인/비상업 사용)
     L.tileLayer(
-      'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+      'https://map{s}.daumcdn.net/map_2d/1811hsm/L{z}/{y}/{x}.png',
       {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
-        subdomains: 'abcd',
-        maxZoom: 20,
+        attribution: '&copy; <a href="https://map.kakao.com">Kakao</a>',
+        subdomains: '1234',
+        maxZoom: 14,
+        minZoom: 7,
+        tileSize: 256,
       }
     ).addTo(map)
 
