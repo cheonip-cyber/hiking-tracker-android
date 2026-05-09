@@ -5,7 +5,7 @@ import type { GpsPoint } from '../types'
 export function useGpsTracking() {
   const { session, addPoint, user } = useAppStore()
   const watchIdRef = useRef<number | null>(null)
-  const wakeLockRef = useRef<WakeLockSentinel | null>(null)
+  const wakeLockRef = useRef<any>(null)
 
   // Wake Lock 획득
   const acquireWakeLock = useCallback(async () => {
@@ -23,7 +23,9 @@ export function useGpsTracking() {
 
   const releaseWakeLock = useCallback(async () => {
     if (wakeLockRef.current) {
-      await wakeLockRef.current.release()
+      try {
+        await (wakeLockRef.current as any).release()
+      } catch (_) {}
       wakeLockRef.current = null
     }
   }, [])
