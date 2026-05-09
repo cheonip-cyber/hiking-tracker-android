@@ -24,11 +24,12 @@ export default function MapView({ className = '' }: MapProps) {
       attributionControl: true,
     })
 
-    // Esri World Street Map — API 키 불필요, CORS 없음, 카카오맵 유사 스타일
+    // CartoDB Voyager — 밝은 베이지/회색, 카카오맵 유사 스타일, API키 불필요
     L.tileLayer(
-      'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',
+      'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
       {
-        attribution: 'Tiles &copy; Esri &mdash; Source: Esri, HERE, Garmin, USGS',
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
+        subdomains: 'abcd',
         maxZoom: 19,
       }
     ).addTo(map)
