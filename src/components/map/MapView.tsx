@@ -25,7 +25,7 @@ export default function MapView({ className = '' }: MapProps) {
         if (window.kakao && window.kakao.maps) { resolve(); return }
 
         const script = document.createElement('script')
-        script.src = `//dapi.kakao.com/v2/maps/sdk.js?appkey=3cf2eb5043d5072a4ee5b245d3b7016c&autoload=false`
+        script.src = `//dapi.kakao.com/v2/maps/sdk.js?appkey=b509cd1334b54f071ae6010f56d9eb19&autoload=false`
         script.async = true
         script.onload = () => {
           window.kakao.maps.load(() => resolve())
