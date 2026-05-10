@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Mountain, ChevronRight, Search, ArrowLeft, TrendingUp, Clock, Route } from 'lucide-react'
+import { Mountain, ChevronRight, Search, ArrowLeft, TrendingUp, Clock, Route, Home } from 'lucide-react'
 import { useAppStore } from '../../store/appStore'
 import { getHikes } from '../../services/hikeService'
 import { formatDate, formatDuration } from '../../utils/gps'
@@ -40,6 +40,10 @@ export default function HistoryScreen() {
           </button>
           <h1 className="text-xl font-bold text-gradient flex-1">등산 기록</h1>
           <span className="text-orange-400/40 text-sm">{hikes.length}회</span>
+          <button onClick={() => navigate('/')}
+            className="w-9 h-9 glass-hi rounded-xl flex items-center justify-center active:scale-90 transition-transform">
+            <Home className="w-4 h-4 text-orange-300" />
+          </button>
         </div>
 
         {/* 요약 통계 */}

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ArrowLeft, Edit2, Check, Trash2, Mountain, MapPin, BarChart2 } from 'lucide-react'
+import { ArrowLeft, Edit2, Check, Trash2, Mountain, MapPin, BarChart2, Home } from 'lucide-react'
 import { FIREBASE_ENABLED, db } from '../../services/firebase'
 import { updateRoute, updateMemo, deleteHike } from '../../services/hikeService'
 import { formatDate, formatDuration } from '../../utils/gps'
@@ -85,11 +85,17 @@ export default function HikeDetailScreen() {
           <div className="text-center">
             <p className="text-gradient font-bold text-base">{formatDate(hike.date)}</p>
           </div>
-          <button onClick={handleDelete}
-            className="w-9 h-9 rounded-xl flex items-center justify-center active:scale-90 transition-transform"
-            style={{ background: 'rgba(220,38,38,0.15)', border: '1px solid rgba(220,38,38,0.25)' }}>
-            <Trash2 className="w-4 h-4 text-red-400" />
-          </button>
+          <div className="flex items-center gap-2">
+            <button onClick={() => navigate('/')}
+              className="w-9 h-9 glass-hi rounded-xl flex items-center justify-center active:scale-90 transition-transform">
+              <Home className="w-4 h-4 text-orange-300" />
+            </button>
+            <button onClick={handleDelete}
+              className="w-9 h-9 rounded-xl flex items-center justify-center active:scale-90 transition-transform"
+              style={{ background: 'rgba(220,38,38,0.15)', border: '1px solid rgba(220,38,38,0.25)' }}>
+              <Trash2 className="w-4 h-4 text-red-400" />
+            </button>
+          </div>
         </div>
       </div>
 

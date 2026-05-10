@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Pause, Play, Square, Zap, ZapOff, Activity } from 'lucide-react'
+import { Pause, Play, Square, Zap, ZapOff, Activity, Home } from 'lucide-react'
 import MapView from '../map/MapView'
 import { useAppStore } from '../../store/appStore'
 import { useGpsTracking } from '../../hooks/useGpsTracking'
@@ -54,7 +54,7 @@ export default function TrackingScreen() {
         {/* 저전력 토글 */}
         <button
           onClick={() => updateSettings({ lowBatteryMode: !lowBattery })}
-          className={`absolute top-4 right-4 z-10 w-10 h-10 rounded-xl glass-hi flex items-center justify-center active:scale-90 transition-transform ${
+          className={`absolute top-4 right-16 z-10 w-10 h-10 rounded-xl glass-hi flex items-center justify-center active:scale-90 transition-transform ${
             lowBattery ? 'border-amber-400/40' : ''
           }`}
         >
@@ -62,6 +62,14 @@ export default function TrackingScreen() {
             ? <ZapOff className="w-4 h-4 text-amber-400" />
             : <Zap className="w-4 h-4 text-orange-300" />
           }
+        </button>
+
+        {/* 홈 버튼 */}
+        <button
+          onClick={() => { stopTracking(); navigate('/') }}
+          className="absolute top-4 right-4 z-10 w-10 h-10 rounded-xl glass-hi flex items-center justify-center active:scale-90 transition-transform"
+        >
+          <Home className="w-4 h-4 text-orange-300" />
         </button>
       </div>
 

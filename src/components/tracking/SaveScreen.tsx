@@ -47,7 +47,7 @@ export default function SaveScreen() {
       }
       await saveHike(hike)
       resetSession()
-      navigate('/history', { replace: true })
+      navigate('/', { replace: true })
     } finally { setIsSaving(false) }
   }
 
