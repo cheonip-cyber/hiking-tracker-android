@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">윤섭아등산가자</string>
+    <string name="title_activity_main">윤섭아등산가자</string>
+    <string name="package_name">com.samsotta.hikingtracker</string>
+    <string name="custom_url_scheme">com.samsotta.hikingtracker</string>
+</resources>

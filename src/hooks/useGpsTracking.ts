@@ -1,57 +1,102 @@
 import { useEffect, useRef, useCallback } from 'react'
+import { Capacitor } from '@capacitor/core'
+import { Geolocation } from '@capacitor/geolocation'
 import { useAppStore } from '../store/appStore'
 import type { GpsPoint } from '../types'
 
+const IS_NATIVE = Capacitor.isNativePlatform()
+
 export function useGpsTracking() {
   const { session, addPoint, user } = useAppStore()
-  const watchIdRef  = useRef<number | null>(null)
-  const wakeLockRef = useRef<any>(null)
-  const isTrackingRef = useRef(false) // 화면 꺼짐 후 재시작 판단용
+  const watchIdRef    = useRef<string | number | null>(null)
+  const wakeLockRef   = useRef<any>(null)
+  const isTrackingRef = useRef(false)
+  const intervalRef   = useRef<ReturnType<typeof setInterval> | null>(null)
 
-  // ─── Wake Lock ───────────────────────────────────────
+  // ─── Wake Lock (PWA 전용) ────────────────────────────
   const acquireWakeLock = useCallback(async () => {
-    if (!('wakeLock' in navigator)) return
-    if (wakeLockRef.current) return // 이미 보유 중
+    if (IS_NATIVE || !('wakeLock' in navigator) || wakeLockRef.current) return
     try {
       wakeLockRef.current = await (navigator as any).wakeLock.request('screen')
-      console.log('[WakeLock] 활성화')
-
-      // Wake Lock 해제 시 자동 재획득 시도
-      wakeLockRef.current.addEventListener('release', async () => {
-        console.log('[WakeLock] 해제됨')
+      wakeLockRef.current.addEventListener('release', () => {
         wakeLockRef.current = null
-        // 화면이 다시 켜질 때 재획득은 visibilitychange에서 처리
       })
-    } catch (e) {
-      console.warn('[WakeLock] 획득 실패:', e)
-    }
+    } catch (e) { console.warn('[WakeLock] 실패:', e) }
   }, [])
 
   const releaseWakeLock = useCallback(async () => {
     if (wakeLockRef.current) {
-      try { await (wakeLockRef.current as any).release() } catch (_) {}
+      try { await wakeLockRef.current.release() } catch (_) {}
       wakeLockRef.current = null
     }
   }, [])
 
-  // ─── GPS watchPosition 시작 ───────────────────────────
-  const startGpsWatch = useCallback(() => {
-    if (!navigator.geolocation) {
-      alert('이 브라우저는 GPS를 지원하지 않습니다.')
-      return
-    }
+  // ─── 네이티브 GPS (@capacitor/geolocation) ───────────
+  // Android는 포그라운드 서비스 + watchPosition으로 백그라운드 지원
+  const startNativeGps = useCallback(async () => {
+    try {
+      // 권한 요청
+      const perm = await Geolocation.requestPermissions()
+      console.log('[GPS] 권한:', perm.location)
 
-    // 기존 watch 정리 후 재시작
+      const settings     = user?.settings
+      const highAccuracy = !settings?.lowBatteryMode
+
+      // watchPosition으로 연속 추적
+      watchIdRef.current = await Geolocation.watchPosition(
+        {
+          enableHighAccuracy: highAccuracy,
+          timeout:            20000,
+          maximumAge:         3000,
+        },
+        (pos, err) => {
+          if (err || !pos) {
+            console.error('[GPS] 오류:', err)
+            return
+          }
+          if (!isTrackingRef.current) return
+
+          const point: GpsPoint = {
+            lat:       pos.coords.latitude,
+            lng:       pos.coords.longitude,
+            alt:       pos.coords.altitude ?? 0,
+            speed:     pos.coords.speed ?? 0,
+            accuracy:  pos.coords.accuracy,
+            timestamp: pos.timestamp,
+          }
+          addPoint(point)
+        }
+      )
+      console.log('[GPS] 네이티브 watchPosition 시작:', watchIdRef.current)
+    } catch (e) {
+      console.error('[GPS] 네이티브 시작 실패:', e)
+      startWebGps()
+    }
+  }, [addPoint, user])
+
+  const stopNativeGps = useCallback(async () => {
     if (watchIdRef.current !== null) {
-      navigator.geolocation.clearWatch(watchIdRef.current)
+      try {
+        await Geolocation.clearWatch({ id: watchIdRef.current as string })
+        console.log('[GPS] 네이티브 watchPosition 중지')
+      } catch (e) { console.warn('[GPS] 중지 실패:', e) }
       watchIdRef.current = null
     }
+  }, [])
 
-    const settings    = user?.settings
+  // ─── 웹 GPS (PWA) ────────────────────────────────────
+  const startWebGps = useCallback(() => {
+    if (!navigator.geolocation) return
+    if (watchIdRef.current !== null) {
+      navigator.geolocation.clearWatch(watchIdRef.current as number)
+      watchIdRef.current = null
+    }
+    const settings     = user?.settings
     const highAccuracy = !settings?.lowBatteryMode
 
     watchIdRef.current = navigator.geolocation.watchPosition(
       (pos) => {
+        if (!isTrackingRef.current) return
         const point: GpsPoint = {
           lat:       pos.coords.latitude,
           lng:       pos.coords.longitude,
@@ -63,47 +108,42 @@ export function useGpsTracking() {
         addPoint(point)
       },
       (err) => {
-        console.error('[GPS] 오류:', err.message)
-        if (err.code === err.PERMISSION_DENIED) {
-          alert('GPS 권한이 필요합니다.\n설정에서 위치 권한을 허용해주세요.')
-        }
-        // 타임아웃 오류 시 자동 재시작
         if (err.code === err.TIMEOUT && isTrackingRef.current) {
-          console.warn('[GPS] 타임아웃 → 재시작')
-          setTimeout(() => {
-            if (isTrackingRef.current) startGpsWatch()
-          }, 2000)
+          setTimeout(() => { if (isTrackingRef.current) startWebGps() }, 2000)
         }
       },
-      {
-        enableHighAccuracy: highAccuracy,
-        timeout:            20000,
-        maximumAge:         5000, // 5초 캐시 허용 (백그라운드 복귀 시 즉시 값 반환)
-      }
+      { enableHighAccuracy: highAccuracy, timeout: 20000, maximumAge: 5000 }
     )
-    console.log('[GPS] watchPosition 시작:', watchIdRef.current)
   }, [addPoint, user])
 
-  const stopGpsWatch = useCallback(() => {
+  const stopWebGps = useCallback(() => {
     if (watchIdRef.current !== null) {
-      navigator.geolocation.clearWatch(watchIdRef.current)
+      navigator.geolocation.clearWatch(watchIdRef.current as number)
       watchIdRef.current = null
-      console.log('[GPS] watchPosition 중지')
     }
   }, [])
 
-  // ─── 트래킹 시작/중지 ────────────────────────────────
-  const startTracking = useCallback(() => {
+  // ─── 통합 시작/중지 ──────────────────────────────────
+  const startTracking = useCallback(async () => {
     isTrackingRef.current = true
-    startGpsWatch()
-    acquireWakeLock()
-  }, [startGpsWatch, acquireWakeLock])
+    if (IS_NATIVE) {
+      await startNativeGps()
+    } else {
+      startWebGps()
+      acquireWakeLock()
+    }
+  }, [startNativeGps, startWebGps, acquireWakeLock])
 
-  const stopTracking = useCallback(() => {
+  const stopTracking = useCallback(async () => {
     isTrackingRef.current = false
-    stopGpsWatch()
-    releaseWakeLock()
-  }, [stopGpsWatch, releaseWakeLock])
+    if (intervalRef.current) { clearInterval(intervalRef.current); intervalRef.current = null }
+    if (IS_NATIVE) {
+      await stopNativeGps()
+    } else {
+      stopWebGps()
+      releaseWakeLock()
+    }
+  }, [stopNativeGps, stopWebGps, releaseWakeLock])
 
   // ─── 상태 변화 감지 ──────────────────────────────────
   useEffect(() => {
@@ -112,47 +152,22 @@ export function useGpsTracking() {
     } else {
       stopTracking()
     }
-    return () => stopTracking()
+    return () => { stopTracking() }
   }, [session.status])
 
-  // ─── 화면 꺼짐/켜짐 처리 (핵심) ──────────────────────
+  // ─── PWA 화면 복귀 시 GPS 재시작 ─────────────────────
   useEffect(() => {
+    if (IS_NATIVE) return
     const handleVisibility = async () => {
       if (!isTrackingRef.current) return
-
-      if (document.visibilityState === 'hidden') {
-        // 화면 꺼짐: GPS watch는 유지 시도, Wake Lock만 해제됨
-        console.log('[Visibility] 화면 꺼짐 — GPS 유지 시도')
-      } else {
-        // 화면 켜짐: Wake Lock 재획득 + GPS 재시작 (Android에서 끊길 수 있음)
-        console.log('[Visibility] 화면 켜짐 — GPS 재시작')
+      if (document.visibilityState === 'visible') {
         await acquireWakeLock()
-
-        // GPS watch가 살아있는지 확인 후 재시작
-        // (Android Chrome은 백그라운드에서 watchPosition이 중단됨)
-        setTimeout(() => {
-          if (isTrackingRef.current) {
-            startGpsWatch()
-          }
-        }, 500)
+        setTimeout(() => { if (isTrackingRef.current) startWebGps() }, 500)
       }
     }
-
     document.addEventListener('visibilitychange', handleVisibility)
     return () => document.removeEventListener('visibilitychange', handleVisibility)
-  }, [acquireWakeLock, startGpsWatch])
+  }, [acquireWakeLock, startWebGps])
 
-  // ─── 네트워크 복귀 시 GPS 재확인 ────────────────────
-  useEffect(() => {
-    const handleOnline = () => {
-      if (isTrackingRef.current) {
-        console.log('[Network] 온라인 복귀 → GPS 재시작')
-        startGpsWatch()
-      }
-    }
-    window.addEventListener('online', handleOnline)
-    return () => window.removeEventListener('online', handleOnline)
-  }, [startGpsWatch])
-
-  return { startTracking, stopTracking }
+  return { isNative: IS_NATIVE }
 }
